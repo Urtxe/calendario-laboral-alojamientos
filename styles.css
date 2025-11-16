@@ -309,4 +309,103 @@
 
         footer p {
         margin: 5px 0; /* Un poco de espacio entre las dos líneas */
+
         }
+
+/* --- CSS RESPONSIVO PARA MÓVILES (Optimizado para 390px) --- */
+
+@media (max-width: 600px) {
+    body {
+        padding: 5px; /* Menos padding general */
+    }
+    
+    h1 {
+        font-size: 1.8em; /* Título más pequeño */
+        margin-bottom: 20px;
+    }
+
+    .config-panel {
+        gap: 10px;
+    }
+
+    .config-card {
+        padding: 15px;
+    }
+
+    .calendar-container {
+        padding: 5px; /* Padding del calendario muy reducido */
+    }
+
+    .calendar-header h2 {
+        font-size: 1.3em; /* 'Enero 2025' más pequeño */
+    }
+
+    .calendar-header button {
+        padding: 8px 10px; /* Botones 'Ant/Sig' más pequeños */
+        font-size: 12px;
+    }
+
+    /* ESTA ES LA PARTE IMPORTANTE (Ajustada para 390px) */
+    .calendar-grid {
+        gap: 2px; /* Espacio entre días mínimo */
+    }
+    
+    .day-header {
+        padding: 4px; /* Menos padding en L, M, X... */
+        font-size: 0.8em; /* Letras 'L, M, X...' más pequeñas */
+    }
+
+    .day-cell {
+        min-height: 40px; /* Cuadrados del día más bajos */
+    }
+
+    .day-number {
+        font-size: 0.85em; /* Números del día más pequeños */
+    }
+
+    .day-cell .emoji {
+        font-size: 8px; /* Emoji diminuto */
+    }
+    /* FIN DE LA PARTE IMPORTANTE */
+
+    .action-buttons {
+        gap: 5px; /* Botones de acción más juntos */
+    }
+
+    .action-buttons button {
+        padding: 8px 10px; /* Botones de acción más pequeños */
+        font-size: 12px; /* Texto de botones más pequeño */
+    }
+
+    .stats-grid {
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 10px;
+    }
+
+    .stat-label {
+        font-size: 0.8em;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+    }
+    
+    .balance-container {
+        padding: 10px;
+    }
+
+    .balance-hours {
+        font-size: 2em;
+    }
+    .balance-days {
+        font-size: 1.3em;
+    }
+
+    footer {
+        padding: 15px;
+        font-size: 0.8em;
+    }
+}
