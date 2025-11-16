@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Calculadora de Balance Laboral</title>
+    
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Balance Laboral</h1>
+
+        <div class="config-panel">
+            <div class="config-card">
+                <label>Días del año
+                <input type="number" id="diasAnuales" value="365"></label>
+            </div>
+            <div class="config-card">
+                <label>Horas anuales requeridas
+                <input type="number" id="horasAnuales" value="1723"></label>
+            </div>
+            <div class="config-card">
+                <label>Festivos trabajados</label>
+                <div class="counter" id="festivosTrabajados">0</div>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button onclick="cambiarMes(-1)">Anterior</button>
+                <h2 id="mesAnio"></h2>
+                <button onclick="cambiarMes(1)">Siguiente</button>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="day-header">L</div>
+                <div class="day-header">M</div>
+                <div class="day-header">X</div>
+                <div class="day-header">J</div>
+                <div class="day-header">V</div>
+                <div class="day-header">S</div>
+                <div class="day-header">D</div>
+            </div>
+
+            <div class="calendar-grid" id="calendario"></div>
+
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn-trabajado" onclick="seleccionarModo('trabajado')">💼 Trabajado</button>
+                <button class="btn-fiesta" onclick="seleccionarModo('fiesta')">📅 Fiesta</button>
+                <button class="btn-vacacion" onclick="seleccionarModo('vacacion')">🏖️ Vacación</button>
+                <button class="btn-abonable" onclick="seleccionarModo('abonable')">🏠 Abonable</button>
+                <button class="btn-baja" onclick="seleccionarModo('baja')">🏥 Baja</button>
+
+                <button class="btn-limpiar" onclick="limpiarCalendario()">🧹 Resetear</button>
+            </div>
+        </div>
+
+        <div class="balance-container">
+            <h2>Balance Laboral</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-label">Días trabajados</div>
+                    <div class="stat-value" id="diasTrabajados">0</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Días de fiesta</div>
+                    <div class="stat-value" id="diasFiesta">0</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Horas trabajadas</div>
+                    <div class="stat-value" id="horasTrabajadas">0h</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Horas requeridas</div>
+                    <div class="stat-value" id="horasRequeridas">0h</div>
+                </div>
+            </div>
+
+            <div class="balance-result positive" id="balanceResult">
+                <div class="balance-label">Balance Final</div>
+                <div class="balance-hours" id="balanceHoras">+0 horas</div>
+                <div class="balance-days" id="balanceDias">+0 días</div>
+                <div class="balance-message" id="balanceMensaje">Perfecto balance</div>
+            </div>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+<footer>
+  <p>&copy; 2025 Todos los derechos reservados.</p>
+  <p>Developed by <strong>Mikel Urtxegi</strong></p>
+</footer>
+</body>
+</html>
