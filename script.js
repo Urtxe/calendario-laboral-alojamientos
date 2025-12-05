@@ -3,6 +3,23 @@ var festivosDonosti = {
         '2025-01-01', '2025-01-06', '2025-01-20', '2025-04-18', '2025-04-21',
         '2025-04-17', '2025-05-01', '2025-07-25', '2025-07-29', '2025-07-31',
         '2025-08-15', '2025-11-01', '2025-12-06', '2025-12-08', '2025-12-25'
+    ],
+    2026: [
+        '2026-01-01', // Año Nuevo
+        '2026-01-06', // Reyes
+        '2026-01-20', // San Sebastián (Local)
+        '2026-03-19', // San José (Sustituye a festivo caído en domingo)
+        '2026-04-02', // Jueves Santo
+        '2026-04-03', // Viernes Santo
+        '2026-04-06', // Lunes de Pascua
+        '2026-05-01', // Día del Trabajo
+        '2026-07-25', // Santiago Apóstol
+        '2025-07-29', // Festivo Alojamientos, Santa Marta
+        '2026-07-31', // San Ignacio (Gipuzkoa)
+        '2026-08-15', // Asunción de la Virgen
+        '2026-10-12', // Fiesta Nacional
+        '2026-12-08', // La Inmaculada
+        '2026-12-25'  // Navidad
     ]
 };
 
@@ -10,8 +27,6 @@ var mesActual = new Date().getMonth();
 var anioActual = new Date().getFullYear();
 var diasMarcados = {};
 
-// --- CAMBIO ---
-// 'diaSeleccionado' ya no es necesario.
 // 'modoSeleccionado' guardará la acción elegida (ej: 'fiesta', 'vacacion').
 // Si es 'null', la acción por defecto será 'trabajado'.
 var modoSeleccionado = null; 
