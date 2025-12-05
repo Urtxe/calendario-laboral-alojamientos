@@ -1,21 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-9MRNB7YGGK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-9MRNB7YGGK');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <title>Calculadora de Balance Laboral</title>
-    
-    
 </head>
 <body>
     <div class="container">
@@ -23,12 +12,13 @@
 
         <div class="config-panel">
             <div class="config-card">
-                <label>Días del año
-                <input type="number" id="diasAnuales" value="365"></label>
+                <label>Año Visualizado
+                <input type="number" id="inputAnio" placeholder="Ej: 2025"></label>
             </div>
+            
             <div class="config-card">
                 <label>Horas anuales requeridas
-                <input type="number" id="horasAnuales" value="1723"></label>
+                <input type="number" id="horasAnuales" placeholder="Ej: 1592"></label>
             </div>
             <div class="config-card">
                 <label>Festivos trabajados</label>
@@ -95,6 +85,23 @@
                 <div class="balance-message" id="balanceMensaje">Perfecto balance</div>
             </div>
         </div>
+
+        <div class="resumen-container">
+            <h3>📊 Histórico Anual</h3>
+            <table id="tablaResumen">
+                <thead>
+                    <tr>
+                        <th>Año</th>
+                        <th>Hechas</th>
+                        <th>Objetivo</th>
+                        <th>Fest. Trab.</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTablaResumen">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
 <script src="script.js"></script>
@@ -103,5 +110,4 @@
   <p>Developed by <strong>Mikel Urtxegi</strong></p>
 </footer>
 </body>
-
 </html>
