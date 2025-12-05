@@ -14,7 +14,7 @@ var festivosDonosti = {
         '2026-04-06', // Lunes de Pascua
         '2026-05-01', // Día del Trabajo
         '2026-07-25', // Santiago Apóstol
-        '2025-07-29', // Festivo Alojamientos, Santa Marta
+        '2026-07-29', // Festivo Alojamientos, Santa Marta
         '2026-07-31', // San Ignacio (Gipuzkoa)
         '2026-08-15', // Asunción de la Virgen
         '2026-10-12', // Fiesta Nacional
@@ -267,4 +267,5 @@ document.getElementById('horasAnuales').addEventListener('input', calcularBalanc
 
 renderCalendario();
 calcularBalance();
+
 actualizarVisualBotones(); // Lo llamamos al inicio por si acaso
