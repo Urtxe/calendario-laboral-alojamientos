@@ -26,14 +26,18 @@ var festivosDonosti = {
 var mesActual = new Date().getMonth();
 var anioActual = new Date().getFullYear();
 var diasMarcados = {};
+var objetivosAnuales = {};
 
-// 'modoSeleccionado' guardará la acción elegida (ej: 'fiesta', 'vacacion').
-// Si es 'null', la acción por defecto será 'trabajado'.
 var modoSeleccionado = null; 
 
 var dataGuardada = localStorage.getItem('misDiasMarcados');
 if (dataGuardada) {
     diasMarcados = JSON.parse(dataGuardada);
+}
+
+var objetivosGuardados = localStorage.getItem('misObjetivosAnuales');
+if (objetivosGuardados) {
+    objetivosAnuales = JSON.parse(objetivosGuardados);
 }
 
 var nombresMeses = [
@@ -87,11 +91,6 @@ function renderCalendario() {
             celda.innerHTML += '<span class="emoji">🎉</span>';
         }
 
-        // --- CAMBIO ---
-        // Ya no usamos la clase 'selected'
-        
-        // --- CAMBIO ---
-        // El clic en la celda ahora llama a 'procesarClickDia'
         celda.onclick = (function(d) {
             return function() { procesarClickDia(d); };
         })(dia);
@@ -102,26 +101,19 @@ function renderCalendario() {
     document.getElementById('mesAnio').textContent = nombresMeses[mesActual] + ' ' + anioActual;
 }
 
-// --- FUNCIÓN NUEVA ---
-// Se llama al hacer clic en un botón de acción (ej: 'Fiesta')
 function seleccionarModo(tipo) {
-    // Si pulsamos el mismo botón otra vez, lo desactivamos (volvemos al modo 'trabajado' por defecto)
     if (modoSeleccionado === tipo) {
         modoSeleccionado = null;
     } else {
         modoSeleccionado = tipo;
     }
-    // Actualizamos el estilo de los botones para saber cuál está activo
     actualizarVisualBotones();
 }
 
-// --- FUNCIÓN NUEVA ---
-// Añade un borde al botón que está activo para que el usuario lo sepa
 function actualizarVisualBotones() {
     var botones = document.querySelectorAll('.action-buttons button');
     botones.forEach(function(btn) {
         var tipoBoton = null;
-        // Extraemos el tipo (ej: de 'btn-fiesta' saca 'fiesta')
         btn.classList.forEach(function(clase) {
             if (clase.startsWith('btn-')) {
                 tipoBoton = clase.replace('btn-', '');
@@ -129,49 +121,36 @@ function actualizarVisualBotones() {
         });
 
         if (tipoBoton && tipoBoton === modoSeleccionado) {
-            // Estilo para el botón activo
             btn.style.outline = '3px solid #333';
             btn.style.transform = 'scale(1.05)';
         } else {
-            // Estilo para botones inactivos
             btn.style.outline = 'none';
             btn.style.transform = 'scale(1)';
         }
     });
 }
 
-// --- FUNCIÓN NUEVA ---
-// Esta función reemplaza a 'seleccionarDia' y 'marcarDia'
-// Se ejecuta CADA VEZ que se hace clic en un día del calendario
 function procesarClickDia(dia) {
-    // 1. Decide qué tipo aplicar
-    // Si hay un modo seleccionado (fiesta, vacacion, etc.), se usa ese.
-    // Si 'modoSeleccionado' es 'null', se usa el modo por defecto: 'trabajado'.
     var tipoParaAplicar = modoSeleccionado;
     if (tipoParaAplicar === null) {
         tipoParaAplicar = 'trabajado';
     }
 
-    // 2. Obtiene los datos del día (como hacía 'marcarDia')
     var fecha = new Date(anioActual, mesActual, dia);
     var fechaKey = getFechaKey(fecha);
     var yaEsFestivo = esFestivo(fecha);
 
-    // 3. Aplica o quita la marca (lógica de 'toggle')
     if (diasMarcados[fechaKey] && diasMarcados[fechaKey].tipo === tipoParaAplicar) {
-        // Si ya estaba marcado con este tipo, lo borra
         delete diasMarcados[fechaKey];
     } else {
-        // Si no, lo marca
         diasMarcados[fechaKey] = { tipo: tipoParaAplicar, esFestivo: yaEsFestivo };
     }
 
-    // 4. Actualiza todo
     renderCalendario();
     calcularBalance();
     guardarDatos();
+    actualizarTablaResumen();
 }
-
 
 function cambiarMes(direccion) {
     mesActual += direccion;
@@ -182,9 +161,22 @@ function cambiarMes(direccion) {
         mesActual = 11;
         anioActual--;
     }
-    // --- CAMBIO ---
-    // Ya no necesitamos resetear 'diaSeleccionado' ni ocultar los botones
+    
+    // --- NUEVO: Sincronizar UI al cambiar con flechas ---
+    actualizarInputsAlCambiarAnio();
+    
     renderCalendario();
+    calcularBalance();
+}
+
+// Función auxiliar para actualizar los inputs cuando cambia el año (por flecha o manual)
+function actualizarInputsAlCambiarAnio() {
+    // 1. Actualizar el input del año
+    document.getElementById('inputAnio').value = anioActual;
+
+    // 2. Actualizar el input de horas objetivo según memoria
+    var horasDelAnio = objetivosAnuales[anioActual] || 0;
+    document.getElementById('horasAnuales').value = horasDelAnio === 0 ? '' : horasDelAnio;
 }
 
 function guardarDatos() {
@@ -192,42 +184,42 @@ function guardarDatos() {
 }
 
 function limpiarCalendario() {
-    // Pedimos confirmación para una acción destructiva
     var confirmacion = confirm("¿Estás seguro de que quieres borrar todos los días marcados? Esta acción no se puede deshacer.");
 
     if (confirmacion) {
-        // 1. Borra todos los datos
         diasMarcados = {};
-        
-        // 2. Resetea el modo seleccionado
         modoSeleccionado = null;
-        
-        // 3. Guarda el estado vacío
         guardarDatos();
-        
-        // 4. Actualiza la vista
         renderCalendario();
         calcularBalance();
         actualizarVisualBotones();
+        actualizarTablaResumen();
     }
 }
 
 function calcularBalance() {
     var horasTrabajadas = 0;
-    var horasRequeridas = parseInt(document.getElementById('horasAnuales').value);
+    var horasRequeridas = objetivosAnuales[anioActual] || parseInt(document.getElementById('horasAnuales').value) || 0;
     var diasTrabajados = 0;
     var diasFiesta = 0;
     var festivosTrabajados = 0;
 
     for (var fecha in diasMarcados) {
+        var anioDeLaFecha = parseInt(fecha.split('-')[0]);
+
+        if (anioDeLaFecha !== anioActual) {
+            continue; 
+        }
+
         var data = diasMarcados[fecha];
+        
         if (data.tipo === 'trabajado' || data.tipo === 'baja') {
             horasTrabajadas += 8;
             diasTrabajados++;
             
             if (data.esFestivo) {
                 festivosTrabajados++;
-                horasRequeridas -= 4; // Ajuste por festivo trabajado
+                horasRequeridas -= 4; 
             }
         }
         if (data.tipo === 'fiesta') {
@@ -245,6 +237,8 @@ function calcularBalance() {
     document.getElementById('festivosTrabajados').textContent = festivosTrabajados;
 
     var balanceResult = document.getElementById('balanceResult');
+    var mensajeAnio = 'Balance ' + anioActual + ': ';
+
     document.getElementById('balanceHoras').textContent = 
         (balance >= 0 ? '+' : '') + balance + ' horas';
     document.getElementById('balanceDias').textContent = 
@@ -253,19 +247,107 @@ function calcularBalance() {
     if (balance >= 0) {
         balanceResult.className = 'balance-result positive';
         document.getElementById('balanceMensaje').textContent = 
-            'Has trabajado más horas de las requeridas';
+            mensajeAnio + 'Has trabajado más horas de las requeridas';
     } else {
         balanceResult.className = 'balance-result negative';
         document.getElementById('balanceMensaje').textContent = 
-            'Te faltan horas por completar';
+            mensajeAnio + 'Te faltan horas por completar';
     }
 }
 
-// --- Código de inicialización ---
-document.getElementById('diasAnuales').addEventListener('input', calcularBalance);
-document.getElementById('horasAnuales').addEventListener('input', calcularBalance);
+function actualizarTablaResumen() {
+    var datosPorAnio = {};
 
+    for (var fecha in diasMarcados) {
+        var anio = fecha.split('-')[0];
+        var data = diasMarcados[fecha];
+
+        if (!datosPorAnio[anio]) {
+            datosPorAnio[anio] = { trabajadas: 0, festivos: 0 };
+        }
+
+        if (data.tipo === 'trabajado' || data.tipo === 'baja') {
+            datosPorAnio[anio].trabajadas += 8;
+            if (data.esFestivo) {
+                datosPorAnio[anio].festivos++;
+            }
+        }
+    }
+
+    var cuerpoTabla = document.getElementById('cuerpoTablaResumen');
+    cuerpoTabla.innerHTML = '';
+    
+    var todosLosAnios = new Set([
+        ...Object.keys(datosPorAnio), 
+        ...Object.keys(objetivosAnuales)
+    ]);
+    
+    var aniosOrdenados = Array.from(todosLosAnios).sort();
+
+    if (aniosOrdenados.length === 0) {
+        cuerpoTabla.innerHTML = '<tr><td colspan="5">Sin datos registrados</td></tr>';
+        return;
+    }
+
+    aniosOrdenados.forEach(function(anio) {
+        var trabajadas = datosPorAnio[anio] ? datosPorAnio[anio].trabajadas : 0;
+        var festivos = datosPorAnio[anio] ? datosPorAnio[anio].festivos : 0;
+        
+        var objetivoBase = objetivosAnuales[anio] || 0;
+        var objetivoReal = objetivoBase - (festivos * 4); 
+
+        var balance = trabajadas - objetivoReal;
+        
+        var colorBalance = balance >= 0 ? '#4caf50' : '#f44336'; 
+        var simbolo = balance > 0 ? '+' : '';
+
+        var fila = document.createElement('tr');
+        fila.innerHTML = 
+            `<td><strong>${anio}</strong></td>` +
+            `<td>${trabajadas}h</td>` +
+            `<td>${objetivoBase}h</td>` +
+            `<td>${festivos}</td>` +
+            `<td style="color:${colorBalance}; font-weight:bold;">${simbolo}${balance}h</td>`;
+        
+        cuerpoTabla.appendChild(fila);
+    });
+}
+
+// --- EVENT LISTENERS ---
+
+// 1. Escuchar cambios manuales en el INPUT DE AÑO
+var inputAnio = document.getElementById('inputAnio');
+inputAnio.addEventListener('input', function() {
+    var nuevoAnio = parseInt(this.value);
+    // Validación simple: entre 1900 y 2100 para no romper cálculos
+    if (nuevoAnio && nuevoAnio > 1900 && nuevoAnio < 2100) {
+        anioActual = nuevoAnio;
+        // Al cambiar el año manualmente, hay que actualizar horas y calendario
+        // No llamamos a 'actualizarInputsAlCambiarAnio' aquí para no sobreescribir lo que estás escribiendo
+        
+        var horasDelAnio = objetivosAnuales[anioActual] || 0;
+        document.getElementById('horasAnuales').value = horasDelAnio === 0 ? '' : horasDelAnio;
+        
+        renderCalendario();
+        calcularBalance();
+    }
+});
+
+// 2. Escuchar cambios en el INPUT DE HORAS (Objetivos)
+var inputHoras = document.getElementById('horasAnuales');
+inputHoras.addEventListener('input', function() {
+    var valor = parseInt(inputHoras.value) || 0;
+    objetivosAnuales[anioActual] = valor;
+    localStorage.setItem('misObjetivosAnuales', JSON.stringify(objetivosAnuales));
+    
+    calcularBalance();
+    actualizarTablaResumen();
+});
+
+
+// --- INICIALIZACIÓN ---
 renderCalendario();
+actualizarInputsAlCambiarAnio(); // Carga año y horas iniciales
 calcularBalance();
-
-actualizarVisualBotones(); // Lo llamamos al inicio por si acaso
+actualizarVisualBotones();
+actualizarTablaResumen();
